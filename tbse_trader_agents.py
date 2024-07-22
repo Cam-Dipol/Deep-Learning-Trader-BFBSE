@@ -133,6 +133,37 @@ class Trader:
         """
         return None
 
+class TraderDeepFBA(Trader):
+    '''
+    Deep learning neural network based trader
+    Loads a previously trained DLNN and allows it to function in the market
+    '''
+
+    def __init__(self, ttype, tid, balance, time, filename):
+
+        self.ttype = ttype  # what type / strategy this trader is
+        self.tid = tid  # trader unique ID code
+        self.balance = balance  # money in the bank
+        self.blotter = []  # record of trades executed
+        self.orders = {}  # customer orders currently being worked (fixed at 1)
+        self.n_quotes = 0  # number of quotes live on LOB
+        self.birth_time = time  # used when calculating age of a trader/strategy
+        self.profit_per_time = 0  # profit per unit t
+        self.n_trades = 0  # how many trades has this trader done?
+        self.last_quote = None  # record of what its last quote was
+        self.times = [0, 0, 0, 0]  # values used to calculate timing elements
+
+        self.model = filename # name of the file storing the NN model
+    
+    def get_trade_data(self):
+        '''
+        Gets data from the LOB that was used to train the model
+
+        Puts this data intot the correct format
+        '''
+    
+    def get_order(self):
+        pass
 
 class TraderGiveaway(Trader):
     """
