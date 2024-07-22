@@ -139,7 +139,7 @@ class TraderDeepFBA(Trader):
     Loads a previously trained DLNN and allows it to function in the market
     '''
 
-    def __init__(self, ttype, tid, balance, time, filename):
+    def __init__(self, ttype, tid, balance, time, model_filepath):
 
         self.ttype = ttype  # what type / strategy this trader is
         self.tid = tid  # trader unique ID code
@@ -153,17 +153,52 @@ class TraderDeepFBA(Trader):
         self.last_quote = None  # record of what its last quote was
         self.times = [0, 0, 0, 0]  # values used to calculate timing elements
 
-        self.model = filename # name of the file storing the NN model
+        self.model = tf.keras.models.load_model(model_filepath) # name of the file storing the NN model
     
-    def get_trade_data(self):
+    def get_input_data(self, lob, time):
         '''
         Gets data from the LOB that was used to train the model
 
-        Puts this data intot the correct format
+        Puts this data into the correct format for input into the model
         '''
-    
+        limit = self.orders[0].price
+
+        best_bid = lob['bids']['best']
+        best_ask = lob['asks']['best']
+
+        if best_bid == None:
+            best_bid = 0
+        if best_ask == None:
+            best_ask = 0
+        
+        if best_bid + best_ask > 0:
+            bid_ask_spread = abs(best_ask - best_bid)
+            midprice = (best_bid + best_ask)/2
+        else:
+            bid_ask_spread = midprice = 0
+        
+        input_data = [time, bid_ask_spread, midprice, best_bid, best_ask]   
+        
+        return input_data
+
+
     def get_order(self):
-        pass
+        if len(self.orders) < 1:
+            order = None
+        else:
+            input_data = self.get_input_data(lob, time)
+
+
+
+
+
+            if otype == "Ask":
+                if model_price < limit:
+                    model_price = limit
+            else:
+                if model_price > limit:
+                    model_price = limit
+        return order
 
 class TraderGiveaway(Trader):
     """
