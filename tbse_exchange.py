@@ -7,7 +7,7 @@ import os
 import sys
 
 from tbse_sys_consts import TBSE_SYS_MIN_PRICE, TBSE_SYS_MAX_PRICE
-
+from Training_data_extraction import get_trade_data, write_to_csv
 
 # pylint: disable=too-many-instance-attributes
 class OrderbookHalf:
@@ -183,8 +183,8 @@ class Exchange(Orderbook):
         order.toid = self.get_quote_id()
         self.increment_quote_id()
 
-        if verbose:
-            print(f'QUID: order.quid={order.qid} self.quote.id={self.quote_id}')
+        #if verbose:
+            #print(f'QUID: order.quid={order.qid} self.quote.id={self.quote_id}')
 
         if order.otype == 'Bid':
             response = self.bids.book_add(order)
@@ -360,6 +360,7 @@ class Exchange(Orderbook):
         old_bids = self.bids.orders.values()
         new_bids = []
         new_asks = []
+        old_lob = self.publish_lob(time, False)
 
         if len(orders)==0:
             lob = self.publish_lob(time, False)
@@ -436,7 +437,14 @@ class Exchange(Orderbook):
                 print(f'TOID: order.toid={o.toid}')
                 print(f'RESPONSE: {response}')
 
+
         lob = self.publish_lob(time, False)
+
+        #if len(transaction_records) > 0:
+            #published_trade_data, final_trade_price = get_trade_data(time, lob, transaction_records, auction_price)
+            #write_to_csv(published_trade_data)
+            #print(published_trade_data)
+            #print(final_trade_price)
 
         return transaction_records,lob,auction_price,len(transaction_records),demand_curve,supply_curve
 

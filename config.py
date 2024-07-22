@@ -3,16 +3,17 @@
 
 # BFBSE 
 
-batch_interval = 10 #interval between batches in number of seconds. 
+batch_interval = 1 #interval between batches in number of seconds. 
 
 # General
-sessionLength = 1  # Length of session in seconds.
+sessionLength = 5  # Length of session in seconds.
+
 virtualSessionLength = 600  # Number of virtual timesteps per sessionLength.
-verbose = False  # Adds additional output for debugging. #changed this to True
+verbose = False # Adds additional output for debugging. #changed this to True
 
 # BSE ONLY
 start_time = 0.0
-end_time = 600.0
+end_time = 10.0
 
 # Trader Schedule
 # Define number of each algorithm used one side of exchange (buyers or sellers).
@@ -29,10 +30,11 @@ useOffset = False  # Use an offset function to vary equilibrium price, this is d
 useInputFile = False  # Use an input file to define order schedule (e.g. Real World Trading data)
 input_file = "RWD/IBM-310817.csv" # Path to real world data input file
 stepmode = 'random'  # Valid values: 'fixed', 'jittered', 'random'
-timemode = 'periodic'  # Valid values: 'periodic', 'drip-fixed', 'drip-jitter', 'drip-poisson'
+timemode = 'drip-fixed'  # Valid values: 'periodic', 'drip-fixed', 'drip-jitter', 'drip-poisson'
 interval = 30  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
 
 # Market supply schedule
+
 supply = {
     'rangeMax': {  # Range of values between which the max possible sell order will be randomly placed
         'rangeHigh': 200,
@@ -55,7 +57,7 @@ demand = {
 }
 
 # For single schedule: using config trader schedule, or command-line trader schedule.
-numTrials = 10
+numTrials = 1
 
 # For multiple schedules: using input csv file. 
 numSchedulesPerRatio = 10  # Number of schedules per ratio of traders in csv file.

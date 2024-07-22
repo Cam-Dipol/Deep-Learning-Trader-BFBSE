@@ -58,6 +58,7 @@ from tbse_customer_orders import customer_orders
 from tbse_exchange import Exchange
 from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
     TraderZic, TraderZip, TraderAa, TraderGdx
+from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv
 
 
 # Adapted from original BSE code
@@ -220,11 +221,11 @@ def run_exchange(
     batch_period = config.batch_interval
     required_batch_number = 1
     last_batch_time = 0
-
-    while start_event.isSet():        
+    lob = []
+    while start_event.is_set():        
         
         virtual_time = (time.time() - start_time) * (virtual_end / sess_length)
-
+        
         while kill_q.empty() is False:
             order = kill_q.get()
             exchange.del_order(virtual_time,order )
@@ -257,16 +258,28 @@ def run_exchange(
         elapsed_time = virtual_time - last_batch_time
         if elapsed_time>=batch_period and required_batch_number !=0 :
             #required_batch_number-=1; #uncomment this for testing
+            #for order in orders_to_batch:
+              #  print(order.otype)
+              #  print(order.price)
+            #print(lob)
+            trade_data = get_trade_data(lob, last_batch_time)
             
             trades, lob,p_eq,q_eq,demand_curve,supply_curve = exchange.process_order_batch2(virtual_time, orders_to_batch, process_verbose)   
 
-            # if trades!=[]:
-            #     print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
-            # else:
-            #     if p_eq==None:
-            #         print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
-            #     else:
-            #         print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
+            if len(trades) > 0:
+                trade_price = get_trade_price(trades, virtual_time)
+                write_to_csv(trade_data, trade_price)
+
+
+            #print(lob)
+            
+            if trades!=[]:
+                 print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
+            else:
+                 if p_eq==None:
+                     print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
+                 else:
+                     print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
             
             for trade in trades: 
                 completed_coid[trade['coid']] = True 
@@ -317,7 +330,7 @@ def run_trader(
     demand_curve = []
     supply_curve = []
 
-    while start_event.isSet():
+    while start_event.is_set():
         time.sleep(0.01)
         #print("in sleep 1")
         virtual_time = (time.time() - start_time) * (virtual_end / sess_length)
@@ -389,7 +402,7 @@ def market_session(
     start_time = time.time()
 
     orders_verbose = False
-    process_verbose = False 
+    process_verbose = False
     respond_verbose = False
     bookkeep_verbose = False
     # create a bunch of traders
@@ -473,7 +486,7 @@ def market_session(
 
 
     # end of an experiment -- dump the tape
-    exchange.tape_dump('transactions.csv', 'a', 'keep')
+    exchange.tape_dump('transactions.csv', 'a', 'wipe')
 
     # write trade_stats for this experiment NB end-of-session summary only
     if len_threads == len(traders) + 2:
