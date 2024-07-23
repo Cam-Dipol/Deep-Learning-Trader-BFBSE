@@ -60,8 +60,6 @@ from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
     TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader
 from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv
 
-DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/simple_test_model.keras'
-
 
 # Adapted from original BSE code
 def trade_stats(expid, traders, dumpfile):
@@ -133,7 +131,7 @@ def populate_market(trader_spec, traders, shuffle, verbose):
         if robot_type == 'GDX':
             return TraderGdx('GDX', name, 0.00, 0)
         if robot_type == 'DFBA':
-            return DeepFBATrader('DFBA', name, 0.00, 0, DFBA_filepath)
+            return DeepFBATrader('DFBA', name, 0.00, 0)
         sys.exit(f'FATAL: don\'t know robot type {robot_type}\n')
 
     def shuffle_traders(ttype_char, n, trader_list):
@@ -277,13 +275,13 @@ def run_exchange(
 
             #print(lob)
             
-            # if trades!=[]:
-            #      print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
-            # else:
-            #      if p_eq==None:
-            #          print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
-            #      else:
-            #          print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
+            if trades!=[]:
+                 print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
+            else:
+                 if p_eq==None:
+                     print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
+                 else:
+                     print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
             
             for trade in trades: 
                 completed_coid[trade['coid']] = True 
@@ -645,7 +643,7 @@ if __name__ == "__main__":
         USE_CONFIG = True
     elif NUM_OF_ARGS == 2:
         USE_CSV = True
-    elif NUM_OF_ARGS == 8:
+    elif NUM_OF_ARGS == 7:
         USE_COMMAND_LINE = True
         try:
             NUM_ZIC = int(sys.argv[1])
@@ -654,9 +652,8 @@ if __name__ == "__main__":
             NUM_AA = int(sys.argv[4])
             NUM_GVWY = int(sys.argv[5])
             NUM_SHVR = int(sys.argv[6])
-            NUM_DFBA = int(sys.argv[7])
         except ValueError:
-            print("ERROR: Invalid trader schedule. Please enter seven integer values.")
+            print("ERROR: Invalid trader schedule. Please enter six integer values.")
             sys.exit()
     else:
         print("Invalid input arguements.")
@@ -667,7 +664,7 @@ if __name__ == "__main__":
         schedule.")
         sys.exit()
     # pylint: disable=too-many-boolean-expressions
-    if NUM_ZIC < 0 or NUM_ZIP < 0 or NUM_GDX < 0 or NUM_AA < 0 or NUM_GVWY < 0 or NUM_SHVR < 0 or NUM_DFBA < 0:
+    if NUM_ZIC < 0 or NUM_ZIP < 0 or NUM_GDX < 0 or NUM_AA < 0 or NUM_GVWY < 0 or NUM_SHVR < 0:
         print("ERROR: Invalid trader schedule. All input integers should be positive.")
         sys.exit()
 
@@ -680,14 +677,13 @@ if __name__ == "__main__":
 
         buyers_spec = [('ZIC', NUM_ZIC), ('ZIP', NUM_ZIP),
                        ('GDX', NUM_GDX), ('AA', NUM_AA),
-                       ('GVWY', NUM_GVWY), ('SHVR', NUM_SHVR),
-                       ('DFBA', NUM_DFBA)]
+                       ('GVWY', NUM_GVWY), ('SHVR', NUM_SHVR)]
 
         sellers_spec = buyers_spec
         traders_spec = {'sellers': sellers_spec, 'buyers': buyers_spec}
 
         file_name = f"{str(NUM_ZIC).zfill(2)}-{str(NUM_ZIP).zfill(2)}-{str(NUM_GDX).zfill(2)}-" \
-                    f"{str(NUM_AA).zfill(2)}-{str(NUM_GVWY).zfill(2)}-{str(NUM_SHVR).zfill(2)}-{str(NUM_DFBA).zfill(2)}.csv"
+                    f"{str(NUM_AA).zfill(2)}-{str(NUM_GVWY).zfill(2)}-{str(NUM_SHVR).zfill(2)}.csv"
         with open(file_name, 'w', encoding="utf-8") as tdump:
 
             trader_count = 0
@@ -742,8 +738,8 @@ if __name__ == "__main__":
     # and have a CSV file with name <string>.csv with a list of values
     # representing the number of each trader type present in the
     # market you wish to run. The order is:
-    # 				ZIC,ZIP,GDX,AA,GVWY,SHVR,DFBA
-    # So an example entry would be: 5,5,0,0,5,5,0
+    # 				ZIC,ZIP,GDX,AA,GVWY,SHVR
+    # So an example entry would be: 5,5,0,0,5,5
     # which would be 5 ZIC traders, 5 ZIP traders, 5 Giveaway traders and
     # 5 Shaver traders. To have different buyer and seller specs modifications
     # would be needed.
@@ -772,16 +768,15 @@ if __name__ == "__main__":
                 NUM_AA = int(ratio[3])
                 NUM_GVWY = int(ratio[4])
                 NUM_SHVR = int(ratio[5])
-                NUM_DFBA = int(ratio[6])
             except ValueError:
-                print("ERROR: Invalid trader schedule. Please enter seven, comma-separated, integer values. Skipping "
+                print("ERROR: Invalid trader schedule. Please enter six, comma-separated, integer values. Skipping "
                       "this trader schedule.")
                 continue
             except Exception as e:  # pylint: disable=broad-except
                 print("ERROR: Unknown input error. Skipping this trader schedule." + str(e))
                 continue
             # pylint: disable=too-many-boolean-expressions
-            if NUM_ZIC < 0 or NUM_ZIP < 0 or NUM_GDX < 0 or NUM_AA < 0 or NUM_GVWY < 0 or NUM_SHVR < 0 or NUM_DFBA < 0:
+            if NUM_ZIC < 0 or NUM_ZIP < 0 or NUM_GDX < 0 or NUM_AA < 0 or NUM_GVWY < 0 or NUM_SHVR < 0:
                 print("ERROR: Invalid trader schedule. All input integers should be positive. Skipping this trader"
                       " schedule.")
                 continue
@@ -793,7 +788,7 @@ if __name__ == "__main__":
                 os.makedirs(results_folder)
 
             file_name = f"{results_folder}/{str(NUM_ZIC).zfill(2)}-{str(NUM_ZIP).zfill(2)}-{str(NUM_GDX).zfill(2)}-" \
-                        f"{str(NUM_AA).zfill(2)}-{str(NUM_GVWY).zfill(2)}-{str(NUM_SHVR).zfill(2)}-{str(NUM_DFBA).zfill(2)}.csv"
+                        f"{str(NUM_AA).zfill(2)}-{str(NUM_GVWY).zfill(2)}-{str(NUM_SHVR).zfill(2)}.csv"
             
             with open(file_name, 'w', encoding="utf-8") as tdump:
 
@@ -803,8 +798,7 @@ if __name__ == "__main__":
 
                     buyers_spec = [('ZIC', NUM_ZIC), ('ZIP', NUM_ZIP),
                                    ('GDX', NUM_GDX), ('AA', NUM_AA),
-                                   ('GVWY', NUM_GVWY), ('SHVR', NUM_SHVR),
-                                   ('DFBA', NUM_DFBA)]
+                                   ('GVWY', NUM_GVWY), ('SHVR', NUM_SHVR)]
 
                     sellers_spec = buyers_spec
                     traders_spec = {'sellers': sellers_spec, 'buyers': buyers_spec}

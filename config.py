@@ -6,7 +6,7 @@
 batch_interval = 1 #interval between batches in number of seconds. 
 
 # General
-sessionLength = 5  # Length of session in seconds.
+sessionLength = 10  # Length of session in seconds.
 
 virtualSessionLength = 600  # Number of virtual timesteps per sessionLength.
 verbose = False # Adds additional output for debugging. #changed this to True
@@ -24,6 +24,7 @@ numGDX = 0
 numAA = 0
 numGVWY = 5
 numSHVR = 0
+numDFBA = 5
 
 # Order Schedule
 useOffset = False  # Use an offset function to vary equilibrium price, this is disabled if useInputFile = True #causes multiple prints sometimes?
@@ -31,7 +32,7 @@ useInputFile = False  # Use an input file to define order schedule (e.g. Real Wo
 input_file = "RWD/IBM-310817.csv" # Path to real world data input file
 stepmode = 'random'  # Valid values: 'fixed', 'jittered', 'random'
 timemode = 'drip-fixed'  # Valid values: 'periodic', 'drip-fixed', 'drip-jitter', 'drip-poisson'
-interval = 30  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
+interval = 1  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
 
 # Market supply schedule
 
@@ -57,7 +58,7 @@ demand = {
 }
 
 # For single schedule: using config trader schedule, or command-line trader schedule.
-numTrials = 1
+numTrials = 2
 
 # For multiple schedules: using input csv file. 
 numSchedulesPerRatio = 10  # Number of schedules per ratio of traders in csv file.
@@ -84,7 +85,8 @@ def parse_config():
         print("CONFIG ERROR: end_time must be a float.")
         valid = False
     if not (isinstance(numZIC, int) and isinstance(numAA, int) and isinstance(numGDX, int) and
-            isinstance(numGVWY, int) and isinstance(numSHVR, int) and isinstance(numZIP, int)):
+            isinstance(numGVWY, int) and isinstance(numSHVR, int) and isinstance(numZIP, int)
+            and isinstance(numDFBA, int)):
         print("CONFIG ERROR: Trader schedule values must be integer.")
         valid = False
     if not isinstance(useOffset, bool):
@@ -132,7 +134,7 @@ def parse_config():
     if end_time <= start_time:
         print("CONFIG ERROR: end_time must be greater than start_time")
         valid = False
-    if numAA < 0 or numGDX < 0 or numGVWY < 0 or numSHVR < 0 or numZIC < 0 or numZIP < 0:
+    if numAA < 0 or numGDX < 0 or numGVWY < 0 or numSHVR < 0 or numZIC < 0 or numZIP < 0 or numDFBA < 0:
         print("CONFIG ERROR: All trader schedule values must be greater than or equal to 0.")
         valid = False
     if stepmode not in ['fixed', 'jittered', 'random']:

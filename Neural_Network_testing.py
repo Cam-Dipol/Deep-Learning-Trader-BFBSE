@@ -7,10 +7,11 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 import numpy as np
 import matplotlib.pyplot as plt
+import joblib
 
 training_data = pd.read_csv('C:/Users/camer/Documents/Masters Thesis/Data/Training data/training_data.csv')
 
-X = training_data.drop(columns=['final_trade_price'])
+X = training_data.drop(columns=['final_trade_price', 'time_of_trade'])
 y = training_data['final_trade_price']
 
 X = X.values
@@ -26,6 +27,9 @@ X_test_2d = X_test.reshape((X_test.shape[0], X_test.shape[2]))
 
 X_train_scaled = scaler.fit_transform(X_train_2d)
 X_test_scaled = scaler.transform(X_test_2d)
+
+scaler_filename = 'scaler.joblib'
+joblib.dump(scaler, scaler_filename)
 
 X_train_scaled = X_train_scaled.reshape((X_train_scaled.shape[0], 1, X_train_scaled.shape[1]))
 X_test_scaled = X_test_scaled.reshape((X_test_scaled.shape[0], 1, X_test_scaled.shape[1]))

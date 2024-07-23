@@ -7,6 +7,10 @@ import sys
 from tbse_msg_classes import Order
 from tbse_sys_consts import TBSE_SYS_MAX_PRICE, TBSE_SYS_MIN_PRICE
 import time as time1
+import joblib
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+import numpy as np
 
 
 # pylint: disable=too-many-instance-attributes
@@ -133,36 +137,26 @@ class Trader:
         """
         return None
 
-class TraderDeepFBA(Trader):
+class DeepFBATrader(Trader):
     '''
     Deep learning neural network based trader
     Loads a previously trained DLNN and allows it to function in the market
     '''
 
-    def __init__(self, ttype, tid, balance, time, model_filepath):
-
-        self.ttype = ttype  # what type / strategy this trader is
-        self.tid = tid  # trader unique ID code
-        self.balance = balance  # money in the bank
-        self.blotter = []  # record of trades executed
-        self.orders = {}  # customer orders currently being worked (fixed at 1)
-        self.n_quotes = 0  # number of quotes live on LOB
-        self.birth_time = time  # used when calculating age of a trader/strategy
-        self.profit_per_time = 0  # profit per unit t
-        self.n_trades = 0  # how many trades has this trader done?
-        self.last_quote = None  # record of what its last quote was
-        self.times = [0, 0, 0, 0]  # values used to calculate timing elements
+    def __init__(self, ttype, tid, balance, time, model_filepath, scaler_path='scaler.joblib'):
+        
+        Trader.__init__(self, ttype, tid, balance, time)
 
         self.model = tf.keras.models.load_model(model_filepath) # name of the file storing the NN model
-    
+        self.scaler = joblib.load(scaler_path)
+
     def get_input_data(self, lob, time):
         '''
         Gets data from the LOB that was used to train the model
 
         Puts this data into the correct format for input into the model
         '''
-        limit = self.orders[0].price
-
+        
         best_bid = lob['bids']['best']
         best_ask = lob['asks']['best']
 
@@ -182,15 +176,21 @@ class TraderDeepFBA(Trader):
         return input_data
 
 
-    def get_order(self):
+    def get_order(self,time,p_eq ,q_eq, demand_curve,supply_curve,countdown,lob):
+
         if len(self.orders) < 1:
             order = None
         else:
+            coid = max(self.orders.keys())
+            limit = self.orders[coid].price
+            otype = self.orders[coid].otype
+
             input_data = self.get_input_data(lob, time)
+            input_data = np.array(input_data).reshape(1, -1)
+            input_data_scaled = self.scaler.transform(input_data)
+            input_data_scaled = input_data_scaled.reshape((input_data_scaled.shape[0], 1, input_data_scaled.shape[1]))
 
-
-
-
+            model_price = self.model.predict(input_data_scaled)[0][0]
 
             if otype == "Ask":
                 if model_price < limit:
@@ -198,6 +198,14 @@ class TraderDeepFBA(Trader):
             else:
                 if model_price > limit:
                     model_price = limit
+
+            quote_price = model_price
+
+            order = Order(self.tid, otype, quote_price, self.orders[coid].qty, time, self.orders[coid].coid,
+                          self.orders[coid].toid)
+            self.last_quote = order
+            # print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
+            
         return order
 
 class TraderGiveaway(Trader):
@@ -225,6 +233,7 @@ class TraderGiveaway(Trader):
                           quote_price,
                           self.orders[coid].qty,
                           time, self.orders[coid].coid, self.orders[coid].toid)
+            
             self.last_quote = order
             #print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
        
