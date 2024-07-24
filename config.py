@@ -3,7 +3,7 @@
 
 # BFBSE 
 
-batch_interval = 1 #interval between batches in number of seconds. 
+batch_interval = 10 #interval between batches in number of seconds. 
 
 # General
 sessionLength = 10  # Length of session in seconds.
@@ -18,12 +18,12 @@ end_time = 10.0
 # Trader Schedule
 # Define number of each algorithm used one side of exchange (buyers or sellers).
 # Same values will be used to define other side of exchange (buyers = sellers).
-numZIC = 0
+numZIC = 5
 numZIP = 5
-numGDX = 0
-numAA = 0
+numGDX = 5
+numAA = 5
 numGVWY = 5
-numSHVR = 0
+numSHVR = 5
 numDFBA = 5
 
 # Order Schedule
@@ -32,7 +32,7 @@ useInputFile = False  # Use an input file to define order schedule (e.g. Real Wo
 input_file = "RWD/IBM-310817.csv" # Path to real world data input file
 stepmode = 'random'  # Valid values: 'fixed', 'jittered', 'random'
 timemode = 'drip-fixed'  # Valid values: 'periodic', 'drip-fixed', 'drip-jitter', 'drip-poisson'
-interval = 1  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
+interval = 30  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
 
 # Market supply schedule
 

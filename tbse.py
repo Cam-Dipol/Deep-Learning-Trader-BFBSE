@@ -277,13 +277,13 @@ def run_exchange(
 
             #print(lob)
             
-            # if trades!=[]:
-            #      print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
-            # else:
-            #      if p_eq==None:
-            #          print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
-            #      else:
-            #          print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
+            if trades!=[]:
+                 print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
+            else:
+                 if p_eq==None:
+                     print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
+                 else:
+                     print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
             
             for trade in trades: 
                 completed_coid[trade['coid']] = True 
