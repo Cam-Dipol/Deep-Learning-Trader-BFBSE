@@ -8,7 +8,7 @@ batch_interval = 1 #interval between batches in number of seconds.
 # General
 sessionLength = 1  # Length of session in seconds.
 
-virtualSessionLength = 5  # Number of virtual timesteps per sessionLength.
+virtualSessionLength = 600  # Number of virtual timesteps per sessionLength.
 verbose = False # Adds additional output for debugging. #changed this to True
 
 # BSE ONLY
@@ -24,7 +24,7 @@ numGDX = 5
 numAA = 0
 numGVWY = 5
 numSHVR = 0
-numDFBA = 0
+numDFBA = 5
 
 # Order Schedule
 useOffset = False  # Use an offset function to vary equilibrium price, this is disabled if useInputFile = True #causes multiple prints sometimes?
@@ -32,7 +32,7 @@ useInputFile = False  # Use an input file to define order schedule (e.g. Real Wo
 input_file = "RWD/IBM-310817.csv" # Path to real world data input file
 stepmode = 'random'  # Valid values: 'fixed', 'jittered', 'random'
 timemode = 'drip-fixed'  # Valid values: 'periodic', 'drip-fixed', 'drip-jitter', 'drip-poisson'
-interval = 1  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
+interval = 10  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
 
 # Market supply schedule
 
@@ -62,7 +62,7 @@ numTrials = 1
 
 # For multiple schedules: using input csv file. 
 numSchedulesPerRatio = 10  # Number of schedules per ratio of traders in csv file.
-numTrialsPerSchedule = 100  # Number of trails per schedule.
+numTrialsPerSchedule = 1  # Number of trails per schedule.
 symmetric = True  # Should range of supply = range of demand?
 
 

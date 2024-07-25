@@ -276,17 +276,17 @@ def run_exchange(
                 trade_price = get_trade_price(trades, virtual_time)
                 write_to_csv(trade_data, trade_price)
 
-            print(trade_data)
-            print(trade_price)
+            # print(trade_data)
+            # print(trade_price)
             #print(lob)
             
-            if trades!=[]:
-                 print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
-            else:
-                 if p_eq==None:
-                     print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
-                 else:
-                     print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
+            # if trades!=[]:
+            #      print(f'There have been {len(trades)} trades in the batch at time {round(virtual_time,2)} at price {round(p_eq,2)}')
+            # else:
+            #      if p_eq==None:
+            #          print(f'There have been no trades at time {round(virtual_time,2)} because no new trades have come in. p_eq is {p_eq}')
+            #      else:
+            #          print(f'There have been no trades at time {round(virtual_time,2)} because no equilibrium could be found. p_eq is {p_eq}')
             
             for trade in trades: 
                 completed_coid[trade['coid']] = True 
@@ -849,7 +849,7 @@ if __name__ == "__main__":
                         tdump.flush()
                         trial = trial + 1
                         trial_number = trial_number + 1
-
+        print('Ratio Done')
         sys.exit('Done Now')
 
     else:

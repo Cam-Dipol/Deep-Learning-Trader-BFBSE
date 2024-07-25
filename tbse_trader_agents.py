@@ -150,7 +150,7 @@ class DeepFBATrader(Trader):
         self.model = tf.keras.models.load_model(model_filepath) # name of the file storing the NN model
         self.scaler = joblib.load(scaler_path)
 
-    def get_input_data(self, lob, time):
+    def get_input_data(self, lob, time, trades_prev_batch, prev_eq_price):
         '''
         Gets data from the LOB that was used to train the model
 
@@ -171,7 +171,22 @@ class DeepFBATrader(Trader):
         else:
             bid_ask_spread = midprice = 0
         
-        input_data = [time, bid_ask_spread, midprice, best_bid, best_ask]   
+        num_bids = lob['bids']['n']
+        num_asks = lob['asks']['n']
+
+        if (num_bids + num_asks != 0):
+            micro_price = ((num_bids * best_ask) + (num_asks * best_bid)) / (num_bids + num_asks)
+        else:
+            micro_price = 0
+        
+        if len(trades_prev_batch) > 0:
+            prev_batch_price = prev_eq_price
+            prev_batch_qty = len(trades_prev_batch)
+        else:
+            prev_batch_price = 0
+            prev_batch_qty = 0
+        
+        input_data = [time, bid_ask_spread, midprice, micro_price, best_bid, best_ask, prev_batch_price, prev_batch_qty]   
         
         return input_data
 
