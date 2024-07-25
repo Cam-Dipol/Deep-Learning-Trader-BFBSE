@@ -1,29 +1,26 @@
 '''
 This file extracts training data for training a deep learning trader
 
-The features that are extracted are as follows (from  Wray et al.):
+The features that are extracted are as follows:
+
 Inputs:
-1. – The time t the trade took place.
-4. + The LOB's bid-ask spread at time t.
-5. + The LOB's midprice at time t.
-6. + The LOB's microprice at time t.
-7. + The best (highest) bid-price on the LOB at time t.
-8. – The best (lowest) ask-price on the LOB at time t.
-10. – The LOB imbalance at time t.
-11. – The total quantity of all quotes on the LOB at time t.
-12. – An estimate P* of the competitive equilibrium price
-at time t, using the method reported in [25][26].
-13. – Smith's a metric [19], calculated from P* at time t.
+1. The time the lob was release (previous batch)
+2. The best bid in the previous batch
+3. The best ask in the previous batch
+4. The bid-ask spread in the previous batch
+5. The midprice in the previous batch
+6. The microprice in the previous batch
+7. The final trade price (equilibrium price) in the previous batch
+8. The quantity of trades completed in the previous batch
 
 Output:
-The price of the trade.
-
+The final trade price of the current batch (equilibrium price)
 '''
 import csv
 import os
 
 
-def get_trade_data(lob, time):
+def get_trade_data(lob, time, trades_prev_batch, prev_eq_price):
     '''
     Getting data from the LOB and transaction records
 
@@ -44,21 +41,38 @@ def get_trade_data(lob, time):
         else:
             bid_ask_spread = midprice = 0
 
-        #microprice = 
+        num_bids = lob['bids']['n']
+        num_asks = lob['asks']['n']
+
+        if (num_bids + num_asks != 0):
+            micro_price = ((num_bids * best_ask) + (num_asks * best_bid)) / (num_bids + num_asks)
+        else:
+            micro_price = 0
+
     else:
         best_bid = 0
         best_ask = 0
         bid_ask_spread = 0
         bid_ask_spread = 0
         midprice = 0
+        micro_price = 0
+    
+    if len(trades_prev_batch) > 0:
+        prev_batch_price = prev_eq_price
+        prev_batch_qty = len(trades_prev_batch)
+    else:
+        prev_batch_price = 0
+        prev_batch_qty = 0
     
     published_trade_data = {
         "time_of_publish": time,
         "bid_ask_spread": bid_ask_spread,
         "midprice": midprice,
-        #"microprice": microprice,
+        "microprice": micro_price,
         "best_bid": best_bid,
         "best_ask": best_ask,
+        "prev_batch_price": prev_batch_price,
+        "prev_batch_trade_qty": prev_batch_qty
     }    
 
     return published_trade_data

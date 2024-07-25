@@ -226,6 +226,8 @@ def run_exchange(
     required_batch_number = 1
     last_batch_time = 0
     lob = []
+    trades = []
+    p_eq = 0
     while start_event.is_set():        
         
         virtual_time = (time.time() - start_time) * (virtual_end / sess_length)
@@ -265,8 +267,8 @@ def run_exchange(
             #for order in orders_to_batch:
               #  print(order.otype)
               #  print(order.price)
-            #print(lob)
-            trade_data = get_trade_data(lob, last_batch_time)
+            #print(trades)
+            trade_data = get_trade_data(lob, last_batch_time, trades, p_eq)
             
             trades, lob,p_eq,q_eq,demand_curve,supply_curve = exchange.process_order_batch2(virtual_time, orders_to_batch, process_verbose)   
 
@@ -274,7 +276,8 @@ def run_exchange(
                 trade_price = get_trade_price(trades, virtual_time)
                 write_to_csv(trade_data, trade_price)
 
-
+            print(trade_data)
+            print(trade_price)
             #print(lob)
             
             if trades!=[]:
