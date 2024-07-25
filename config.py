@@ -6,7 +6,7 @@
 batch_interval = 1 #interval between batches in number of seconds. 
 
 # General
-sessionLength = 30  # Length of session in seconds.
+sessionLength = 2  # Length of session in seconds.
 
 virtualSessionLength = 600  # Number of virtual timesteps per sessionLength.
 verbose = False # Adds additional output for debugging. #changed this to True
@@ -61,7 +61,7 @@ demand = {
 numTrials = 1
 
 # For multiple schedules: using input csv file. 
-numSchedulesPerRatio = 10  # Number of schedules per ratio of traders in csv file.
+numSchedulesPerRatio = 1  # Number of schedules per ratio of traders in csv file.
 numTrialsPerSchedule = 1  # Number of trails per schedule.
 symmetric = True  # Should range of supply = range of demand?
 

@@ -849,7 +849,7 @@ if __name__ == "__main__":
                         tdump.flush()
                         trial = trial + 1
                         trial_number = trial_number + 1
-        print('Ratio Done')
+            print('Ratio Done')
         sys.exit('Done Now')
 
     else:
