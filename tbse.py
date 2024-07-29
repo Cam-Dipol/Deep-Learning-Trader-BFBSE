@@ -60,7 +60,7 @@ from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
     TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader
 from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv
 
-DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/simple_test_model.keras'
+DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/1secbatch_modelv1.keras'
 
 
 # Adapted from original BSE code

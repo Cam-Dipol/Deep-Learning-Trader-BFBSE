@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import joblib
 
-training_data = pd.read_csv('C:/Users/camer/Documents/Masters Thesis/Data/Training data/training_data.csv')
+training_data = pd.read_csv('C:/Users/camer/Documents/Masters Thesis/Data/Training data/Full_proportion_test_1secbatch_10schedulerep.csv')
 
 X = training_data.drop(columns=['final_trade_price', 'time_of_trade'])
 y = training_data['final_trade_price']
@@ -42,8 +42,7 @@ model = Sequential([
 
 model.compile(optimizer='adam', loss='mean_squared_error')
 
-history = model.fit(X_train_scaled, y_train, epochs=50, validation_split=0.2, verbose=1)
-
+history = model.fit(X_train_scaled, y_train, epochs=20, validation_split=0.2, verbose=1)
 test_loss = model.evaluate(X_test_scaled, y_test, verbose=1)
 plt.figure(figsize=(10, 6))
 plt.plot(history.history['loss'], label='Training Loss')
