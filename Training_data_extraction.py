@@ -18,6 +18,7 @@ The final trade price of the current batch (equilibrium price)
 '''
 import csv
 import os
+from datetime import datetime
 
 
 def get_trade_data(lob, time, trades_prev_batch, prev_eq_price):
@@ -90,25 +91,31 @@ def get_trade_price(transactions, time):
      
     return final_trade_price
 
-def write_to_csv(visible_trade_data, trade_price, folder_path='C:/Users/camer/Documents/Masters Thesis/Data/Training data', filename='training_data.csv'):
-        '''
-        Writes the current trade data to a csv file
-        '''
-        training_data = {**visible_trade_data, **trade_price}
+def make_csv(folder_path='C:/Users/camer/Documents/Masters Thesis/Data/Training data'):
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        
+        
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"training_data_{timestamp}.csv"
+    full_file_path = os.path.join(folder_path, filename)
+        
+    return full_file_path
+def write_to_csv(visible_trade_data, trade_price, file_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data/training_data'):
+    '''
+    Writes the current trade data to a csv file
+    '''
 
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+    training_data = {**visible_trade_data, **trade_price}
+    file_exists = os.path.isfile(file_path)
+    
+    with open(file_path, mode='a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=training_data.keys())
         
-        full_file_path = os.path.join(folder_path, filename)
-        file_exists = os.path.isfile(full_file_path)
-        
-        with open(full_file_path, mode='a', newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=training_data.keys())
+        if not file_exists:
+            writer.writeheader()
             
-            if not file_exists:
-                writer.writeheader()
-                
-            writer.writerow(training_data)
+        writer.writerow(training_data)
 
 
 

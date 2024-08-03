@@ -6,9 +6,9 @@
 batch_interval = 1 #interval between batches in number of seconds. 
 
 # General
-sessionLength = 1  # Length of session in seconds.
+sessionLength = 50  # Length of session in seconds.
 
-virtualSessionLength = 600  # Number of virtual timesteps per sessionLength.
+virtualSessionLength = 28800  # Number of virtual timesteps per sessionLength.
 verbose = False # Adds additional output for debugging. #changed this to True
 
 # BSE ONLY
@@ -20,9 +20,9 @@ end_time = 10.0
 # Same values will be used to define other side of exchange (buyers = sellers).
 numZIC = 5
 numZIP = 5
-numGDX = 0
+numGDX = 5
 numAA = 0
-numGVWY = 5
+numGVWY = 0
 numSHVR = 0
 numDFBA = 0
 
@@ -61,7 +61,7 @@ demand = {
 numTrials = 1
 
 # For multiple schedules: using input csv file. 
-numSchedulesPerRatio = 40  # Number of schedules per ratio of traders in csv file.
+numSchedulesPerRatio = 1  # Number of schedules per ratio of traders in csv file.
 numTrialsPerSchedule = 1  # Number of trails per schedule.
 symmetric = True  # Should range of supply = range of demand?
 

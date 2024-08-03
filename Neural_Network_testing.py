@@ -9,7 +9,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import joblib
 
-training_data = pd.read_csv('C:/Users/camer/Documents/Masters Thesis/Data/Training data/Full_proportion_test_1secbatch_10schedulerep.csv')
+filepath = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data/1 sec batch/'
+
+data1 = pd.read_csv(f'{filepath}Full_proportion_test_1secbatch_10schedulerep.csv')
+data2 = pd.read_csv(f'{filepath}Full_proportion_test_1secbatch_10schedulerepv2.csv')
+data3 = pd.read_csv(f'{filepath}Full_proportion_test_1secbatch_10schedulerepv3.csv')
+data4 = pd.read_csv(f'{filepath}Full_proportion_test_1secbatch_10schedulerepv4.csv')
+data5 = pd.read_csv(f'{filepath}Full_proportion_test_1secbatch_10schedulerepv5.csv')
+
+training_data = pd.concat([data1,data2,data3,data4,data5], ignore_index= True )
+
 
 X = training_data.drop(columns=['final_trade_price', 'time_of_trade'])
 y = training_data['final_trade_price']
@@ -42,7 +51,7 @@ model = Sequential([
 
 model.compile(optimizer='adam', loss='mean_squared_error')
 
-history = model.fit(X_train_scaled, y_train, epochs=20, validation_split=0.2, verbose=1)
+history = model.fit(X_train_scaled, y_train, epochs=10, validation_split=0.2, verbose=1)
 test_loss = model.evaluate(X_test_scaled, y_test, verbose=1)
 plt.figure(figsize=(10, 6))
 plt.plot(history.history['loss'], label='Training Loss')

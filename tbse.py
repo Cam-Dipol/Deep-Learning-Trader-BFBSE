@@ -58,9 +58,9 @@ from tbse_customer_orders import customer_orders
 from tbse_exchange import Exchange
 from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
     TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader
-from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv
+from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv, make_csv
 
-DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/1secbatch_modelv1.keras'
+DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/1secbatch_modelv2.keras'
 
 
 # Adapted from original BSE code
@@ -228,6 +228,7 @@ def run_exchange(
     lob = []
     trades = []
     p_eq = 0
+
     while start_event.is_set():        
         
         virtual_time = (time.time() - start_time) * (virtual_end / sess_length)
@@ -274,7 +275,7 @@ def run_exchange(
 
             if len(trades) > 0:
                 trade_price = get_trade_price(trades, virtual_time)
-                write_to_csv(trade_data, trade_price)
+                write_to_csv(trade_data, trade_price, file_path)
 
             # print(trade_data)
             # print(trade_price)
@@ -691,6 +692,8 @@ if __name__ == "__main__":
 
         file_name = f"{str(NUM_ZIC).zfill(2)}-{str(NUM_ZIP).zfill(2)}-{str(NUM_GDX).zfill(2)}-" \
                     f"{str(NUM_AA).zfill(2)}-{str(NUM_GVWY).zfill(2)}-{str(NUM_SHVR).zfill(2)}-{str(NUM_DFBA).zfill(2)}.csv"
+        
+        file_path = make_csv() # For training data
         with open(file_name, 'w', encoding="utf-8") as tdump:
 
             trader_count = 0
@@ -754,6 +757,7 @@ if __name__ == "__main__":
     elif USE_CSV:
         server = sys.argv[1]
         ratios = []
+        file_path = make_csv() # For training data
         try:
             with open(server, newline='', encoding="utf-8") as csv_file:
                 reader = csv.reader(csv_file, delimiter=',')
@@ -767,6 +771,7 @@ if __name__ == "__main__":
             sys.exit()
 
         trial_number = 1
+        ratio_num = 1
         for ratio in ratios:
             try:
                 NUM_ZIC = int(ratio[0])
@@ -849,7 +854,8 @@ if __name__ == "__main__":
                         tdump.flush()
                         trial = trial + 1
                         trial_number = trial_number + 1
-            print('Ratio Done')
+            print(f'Ratio:{ratio_num} Done')
+            ratio_num += 1
         sys.exit('Done Now')
 
     else:
