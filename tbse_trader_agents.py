@@ -206,6 +206,7 @@ class DeepFBATrader(Trader):
             input_data = np.array(input_data).reshape(1, -1)
             input_data_scaled = self.scaler.transform(input_data)
             input_data_scaled = input_data_scaled.reshape((input_data_scaled.shape[0], 1, input_data_scaled.shape[1]))
+            input_data_scaled = input_data_scaled.astype(np.float16)
 
             model_price = self.model.predict(input_data_scaled)[0][0]
 

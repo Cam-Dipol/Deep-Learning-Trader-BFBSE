@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import joblib
 import os
 
-root_folder_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data'
-specific_folder = '/1 sec batch full trading day'
+root_folder_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data/'
+specific_folder = '1 sec batch full trading day'
 folder_path = root_folder_path + specific_folder
 
 data_sets = []
@@ -23,8 +23,10 @@ for filename in os.listdir(folder_path):
 
 large_csv = pd.concat(data_sets, ignore_index=True)
 large_csv.to_csv(f'{folder_path}/all_data.csv', index=False)
+large_csv = pd.read_csv('C:/Users/camer/Documents/Masters Thesis/Data/Training data/Full_proportion_test_1secbatch_1schedulerep.csv')
 
 training_data = large_csv
+print('data collected')
 
 def prepare_data(training_data):
 
@@ -56,12 +58,12 @@ def prepare_data(training_data):
 def create_DFBA_model(X_train_scaled, X_test_scaled, y_train, y_test):
 
     model = Sequential()
-    model.add(LSTM(10, activation='relu', input_shape=(timesteps, features)))
+    model.add(LSTM(10, activation='relu', input_shape=(X_train_scaled.shape[1], X_train_scaled.shape[2])))
     model.add(Dense(5, activation='relu'))
     model.add(Dense(3, activation='relu'))
     model.add(Dense(1))
 
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
 
     history = model.fit(X_train_scaled, y_train, epochs=10, validation_split=0.2, verbose=1)
     test_loss = model.evaluate(X_test_scaled, y_test, verbose=1)
@@ -70,14 +72,14 @@ def create_DFBA_model(X_train_scaled, X_test_scaled, y_train, y_test):
 
 if __name__ == "__main__":
 
-    X_train_scaled, X_test_scaled, y_train, y_test = prepare_data()
+    X_train_scaled, X_test_scaled, y_train, y_test = prepare_data(training_data)
+    print('data processed')
 
     history, test_loss = create_DFBA_model(X_train_scaled, X_test_scaled, y_train, y_test)
 
     plt.figure(figsize=(10, 6))
     plt.plot(history.history['loss'], label='Training Loss')
     plt.plot(history.history['val_loss'], label='Validation Loss')
-    plt.axhline(y=test_loss, color='r', linestyle='--', label=f'Test Loss: {test_loss:.4f}')
     plt.title('Loss Over Epochs')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')

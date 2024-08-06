@@ -101,7 +101,7 @@ def make_csv(folder_path='C:/Users/camer/Documents/Masters Thesis/Data/Training 
     full_file_path = os.path.join(folder_path, filename)
         
     return full_file_path
-def write_to_csv(visible_trade_data, trade_price, file_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data/training_data'):
+def write_to_csv(visible_trade_data, trade_price, file_path):
     '''
     Writes the current trade data to a csv file
     '''
