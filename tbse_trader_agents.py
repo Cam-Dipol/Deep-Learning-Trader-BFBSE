@@ -151,6 +151,7 @@ class DeepFBATrader(Trader):
         self.scaler = joblib.load(scaler_path)
         self.input_data = []
 
+
     def get_input_data(self,time,p_eq, q_eq,lob):
         '''
         Gets data from the LOB that was used to train the model
@@ -208,7 +209,7 @@ class DeepFBATrader(Trader):
             input_data_scaled = input_data_scaled.reshape((input_data_scaled.shape[0], 1, input_data_scaled.shape[1]))
             input_data_scaled = input_data_scaled.astype(np.float16)
 
-            model_price = self.model.predict(input_data_scaled)[0][0]
+            model_price = self.model.predict(input_data_scaled, verbose = 0)[0][0]
 
             if otype == "Ask":
                 if model_price < limit:
