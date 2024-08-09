@@ -151,6 +151,11 @@ class DeepFBATrader(Trader):
         self.scaler = joblib.load(scaler_path)
         self.input_data = []
 
+        # self.interpreter = tf.lite.Interpreter(model_path=model_filepath)
+        # self.interpreter.allocate_tensors()
+        # self.input_details = self.interpreter.get_input_details()
+        # self.output_details = self.interpreter.get_output_details()
+
 
     def get_input_data(self,time,p_eq, q_eq,lob):
         '''
@@ -208,6 +213,10 @@ class DeepFBATrader(Trader):
             input_data_scaled = self.scaler.transform(input_data)
             input_data_scaled = input_data_scaled.reshape((input_data_scaled.shape[0], 1, input_data_scaled.shape[1]))
             input_data_scaled = input_data_scaled.astype(np.float16)
+
+            # self.interpreter.set_tensor(self.input_details[0]['index'], input_data_scaled)
+            # self.interpreter.invoke()
+            # model_price = self.interpreter.get_tensor(self.output_details[0]['index'])[0][0]
 
             model_price = self.model.predict(input_data_scaled, verbose = 0)[0][0]
 
