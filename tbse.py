@@ -59,9 +59,11 @@ from tbse_exchange import Exchange
 from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
     TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader
 from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv, make_csv
+import tensorflow as tf
+from tensorflow.keras import backend as K
 
 DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/1secbatch_modelv5.keras'
-
+DFBA_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/1secbatch_scalerv5.joblib'
 
 # Adapted from original BSE code
 def trade_stats(expid, traders, dumpfile):
@@ -133,7 +135,7 @@ def populate_market(trader_spec, traders, shuffle, verbose):
         if robot_type == 'GDX':
             return TraderGdx('GDX', name, 0.00, 0)
         if robot_type == 'DFBA':
-            return DeepFBATrader('DFBA', name, 0.00, 0, DFBA_filepath)
+            return DeepFBATrader('DFBA', name, 0.00, 0, DFBA_filepath, DFBA_scaler)
         sys.exit(f'FATAL: don\'t know robot type {robot_type}\n')
 
     def shuffle_traders(ttype_char, n, trader_list):
@@ -799,9 +801,10 @@ if __name__ == "__main__":
             results_folder = "test_results"
             if not os.path.exists(results_folder):
                 os.makedirs(results_folder)
-
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             file_name = f"{results_folder}/{str(NUM_ZIC).zfill(2)}-{str(NUM_ZIP).zfill(2)}-{str(NUM_GDX).zfill(2)}-" \
-                        f"{str(NUM_AA).zfill(2)}-{str(NUM_GVWY).zfill(2)}-{str(NUM_SHVR).zfill(2)}-{str(NUM_DFBA).zfill(2)}.csv"
+                        f"{str(NUM_AA).zfill(2)}-{str(NUM_GVWY).zfill(2)}-{str(NUM_SHVR).zfill(2)}-{str(NUM_DFBA).zfill(2)}-{timestamp}.csv"
             
             with open(file_name, 'w', encoding="utf-8") as tdump:
 
@@ -856,6 +859,7 @@ if __name__ == "__main__":
                         trial_number = trial_number + 1
             print(f'Ratio:{ratio_num} Done')
             ratio_num += 1
+            K.clear_session()
         sys.exit('Done Now')
 
     else:
