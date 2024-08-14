@@ -82,7 +82,10 @@ def get_trade_price(transactions, time):
     '''
     Method that gets trade information: price and time of trade
     '''
-    trade_price = transactions[0]['price']
+    if len(transactions) > 0:
+        trade_price = transactions[0]['price']
+    else:
+        trade_price = 0
 
     final_trade_price = {
          "time_of_trade": time,
@@ -90,6 +93,19 @@ def get_trade_price(transactions, time):
     }
      
     return final_trade_price
+
+def get_order_data(order):
+
+    tid = order.tid
+    quote_price = order.price
+
+    order_data = {
+        "trader_id": tid,
+        "quote_price": quote_price,
+        "customer_order_id": order.coid,
+    }
+
+    return order_data
 
 def make_csv(folder_path='C:/Users/camer/Documents/Masters Thesis/Data/Training data'):
     if not os.path.exists(folder_path):
@@ -101,12 +117,12 @@ def make_csv(folder_path='C:/Users/camer/Documents/Masters Thesis/Data/Training 
     full_file_path = os.path.join(folder_path, filename)
         
     return full_file_path
-def write_to_csv(visible_trade_data, trade_price, file_path):
+def write_to_csv(visible_trade_data, trade_price, order_data, file_path):
     '''
     Writes the current trade data to a csv file
     '''
 
-    training_data = {**visible_trade_data, **trade_price}
+    training_data = {**visible_trade_data, **order_data, **trade_price}
     file_exists = os.path.isfile(file_path)
     
     with open(file_path, mode='a', newline='') as file:

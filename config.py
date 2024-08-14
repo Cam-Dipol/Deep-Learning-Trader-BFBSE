@@ -6,9 +6,9 @@
 batch_interval = 1 # interval between batches in number of seconds. 
 
 # General
-sessionLength = 2  # Length of session in seconds.
+sessionLength = 1  # Length of session in seconds.
 
-virtualSessionLength = 50  # Number of virtual timesteps per sessionLength.
+virtualSessionLength = 5  # Number of virtual timesteps per sessionLength.
 verbose = False # Adds additional output for debugging. #changed this to True
 
 # BSE ONLY
@@ -19,12 +19,12 @@ end_time = 10.0
 # Define number of each algorithm used one side of exchange (buyers or sellers).
 # Same values will be used to define other side of exchange (buyers = sellers).
 numZIC = 0
-numZIP = 0
+numZIP = 5
 numGDX = 0
-numAA = 0
-numGVWY = 0
-numSHVR = 1
-numDFBA = 19
+numAA = 5
+numGVWY = 5
+numSHVR = 0
+numDFBA = 0
 
 # Order Schedule
 useOffset = False  # Use an offset function to vary equilibrium price, this is disabled if useInputFile = True #causes multiple prints sometimes?

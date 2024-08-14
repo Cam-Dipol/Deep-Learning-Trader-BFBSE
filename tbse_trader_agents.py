@@ -33,6 +33,7 @@ class Trader:
         self.n_trades = 0  # how many trades has this trader done?
         self.last_quote = None  # record of what its last quote was
         self.times = [0, 0, 0, 0]  # values used to calculate timing elements
+        self.order_info = []
 
     def __str__(self):
         return f'[TID {self.tid} type {self.ttype} balance {self.balance} blotter {self.blotter} ' \
@@ -137,6 +138,7 @@ class Trader:
         :return: The order
         """
         return None
+    
 
 class DeepFBATrader(Trader):
     '''
@@ -272,11 +274,9 @@ class TraderGiveaway(Trader):
                           time, self.orders[coid].coid, self.orders[coid].toid)
             
             self.last_quote = order
-            #print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
+            # print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
        
         return order
-
-
 class TraderZic(Trader):
     """ Trader subclass ZI-C
     After Gode & Sunder 1993"""

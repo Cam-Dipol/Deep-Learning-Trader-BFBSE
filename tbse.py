@@ -58,7 +58,7 @@ from tbse_customer_orders import customer_orders
 from tbse_exchange import Exchange
 from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
     TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader
-from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv, make_csv
+from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv, make_csv, get_order_data
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
@@ -120,6 +120,7 @@ def populate_market(trader_spec, traders, shuffle, verbose):
         :param name: String, name given to trader
         :return: Instantiated Trader object
         """
+
         if robot_type == 'GVWY':
             return TraderGiveaway('GVWY', name, 0.00, 0)
         if robot_type == 'ZIC':
@@ -231,8 +232,8 @@ def run_exchange(
     trades = []
     p_eq = 0
 
-    while start_event.is_set():        
-        
+    while start_event.is_set():      
+
         virtual_time = (time.time() - start_time) * (virtual_end / sess_length)
         
         while kill_q.empty() is False:
@@ -267,17 +268,19 @@ def run_exchange(
         elapsed_time = virtual_time - last_batch_time
         if elapsed_time>=batch_period and required_batch_number !=0 :
             #required_batch_number-=1; #uncomment this for testing
-            #for order in orders_to_batch:
-              #  print(order.otype)
-              #  print(order.price)
-            #print(trades)
+
             trade_data = get_trade_data(lob, last_batch_time, trades, p_eq)
-            
+
             trades, lob,p_eq,q_eq,demand_curve,supply_curve = exchange.process_order_batch2(virtual_time, orders_to_batch, process_verbose)   
 
-            if len(trades) > 0:
-                trade_price = get_trade_price(trades, virtual_time)
-                write_to_csv(trade_data, trade_price, file_path)
+            trade_price = get_trade_price(trades, virtual_time)
+
+            if len(orders_to_batch) > 0:
+                for order in orders_to_batch:
+                    order_data = get_order_data(order)
+                    write_to_csv(trade_data, trade_price, order_data, file_path)
+
+            
 
             # print(trade_data)
             # print(trade_price)
@@ -367,6 +370,13 @@ def run_trader(
         time2 = time.time()
         order = trader.get_order(virtual_time,p_eq,q_eq,demand_curve,supply_curve, time_left, lob)
         
+        # if trader.ttype == 'GVWY':
+        #     temp_quote_price = order.price
+        #     temp_coid = order.coid
+        #     temp_limit_price = trader.orders[temp_coid].price
+        #     get_quote_price(temp_quote_price, temp_limit_price)
+
+
         time3 = time.time()
         trader.times[1] += time2 - time1
         trader.times[3] += 1
@@ -470,6 +480,7 @@ def market_session(
         # distribute customer orders
         [pending_cust_orders, kills, cuid] = customer_orders(virtual_time, cuid, traders, trader_stats,
                                                              order_schedule, pending_cust_orders, orders_verbose)
+
         # if any newly-issued customer orders mean quotes on the LOB need to be cancelled, kill them
         if len(kills) > 0:
             if verbose:
