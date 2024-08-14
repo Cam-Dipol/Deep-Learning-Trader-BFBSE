@@ -58,7 +58,7 @@ from tbse_customer_orders import customer_orders
 from tbse_exchange import Exchange
 from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
     TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader
-from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv, make_csv, get_order_data
+from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv, make_csv, get_order_data, export_quote_logs
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
@@ -369,7 +369,8 @@ def run_trader(
         trader.respond(virtual_time,p_eq,q_eq,demand_curve,supply_curve, lob, trades, respond_verbose) #may need to pass trades. Don't want to run this until all trades have been processed
         time2 = time.time()
         order = trader.get_order(virtual_time,p_eq,q_eq,demand_curve,supply_curve, time_left, lob)
-        
+        # if trader.ttype == 'ZIC':
+        #     print(order)
         # if trader.ttype == 'GVWY':
         #     temp_quote_price = order.price
         #     temp_coid = order.coid
@@ -505,9 +506,22 @@ def market_session(
     for thread in trader_threads:
         thread.join()
 
+    traders_to_track = ['GVWY', 'ZIP', 'AA']
+    export_quote_logs(traders, traders_to_track)
+    # for trader in traders.values():
+    #     if trader.ttype == 'GVWY':
+    #         # print(f"Saving CSV for trader ID: {trader.tid}, Type: {trader.ttype}")
+    #         trader.quote_log_to_csv()
+    #     elif trader.ttype == 'ZIP':
+    #         # print(f"Saving CSV for trader ID: {trader.tid}, Type: {trader.ttype}")
+    #         trader.quote_log_to_csv()
+    #     # else:
+    #     #     print(f"Trader ID: {trader.tid}, Type: {trader.ttype} not selected for saving.")
+
 
     # end of an experiment -- dump the tape
     exchange.tape_dump('transactions.csv', 'a', 'wipe')
+
 
     # write trade_stats for this experiment NB end-of-session summary only
     if len_threads == len(traders) + 2:

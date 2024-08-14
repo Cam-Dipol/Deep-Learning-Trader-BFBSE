@@ -18,8 +18,34 @@ The final trade price of the current batch (equilibrium price)
 '''
 import csv
 import os
+import time
 from datetime import datetime
 
+def export_quote_logs(traders, tracked_trader_types):
+    print('Saving quote logs...')
+    folder_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data'
+
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    output_file = f'training_quote_logs_{timestamp}.csv'
+    output_path = os.path.join(folder_path, output_file)
+
+    quote_logs = []
+
+    for trader in traders.values():
+        if trader.ttype in tracked_trader_types:
+            for log_entry in trader.quote_log:
+                quote_logs.append(log_entry)
+
+    with open(output_path, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        
+        headers = ['time', 'bid_ask_spread', 'midprice', 'micro_price', 'best_bid', 'best_ask', 'p_eq', 'q_eq', 'tid', 'limit_price', 'quote_price']
+        writer.writerow(headers)
+        
+        writer.writerows(quote_logs)
+
+    print(f"Quote logs saved")
+    return
 
 def get_trade_data(lob, time, trades_prev_batch, prev_eq_price):
     '''

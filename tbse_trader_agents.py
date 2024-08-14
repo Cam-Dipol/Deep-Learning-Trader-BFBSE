@@ -3,6 +3,9 @@
 import math
 import random
 import sys
+import os
+import csv
+import time
 
 from tbse_msg_classes import Order
 from tbse_sys_consts import TBSE_SYS_MAX_PRICE, TBSE_SYS_MIN_PRICE
@@ -12,6 +15,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.models import load_model
 import numpy as np
+from datetime import datetime
 
 
 # pylint: disable=too-many-instance-attributes
@@ -33,11 +37,79 @@ class Trader:
         self.n_trades = 0  # how many trades has this trader done?
         self.last_quote = None  # record of what its last quote was
         self.times = [0, 0, 0, 0]  # values used to calculate timing elements
-        self.order_info = []
+        self.quote_log = []
 
     def __str__(self):
         return f'[TID {self.tid} type {self.ttype} balance {self.balance} blotter {self.blotter} ' \
                f'orders {self.orders} n_trades {self.n_trades} profit_per_time {self.profit_per_time}]'
+    
+    def save_quote_log(self, lob, time, p_eq, q_eq, quote_price, limit_price, order_type):
+        '''
+        Recording the data used an input for each quote along with the quote price and limit price
+        tracking it on a list assigned to each trader
+        '''
+        # tracking quote price and limit price data
+        order_type_val = 0
+
+        if order_type == "Ask":
+            order_type_val = 1
+        
+        order_data = [self.ttype, order_type_val, limit_price,  quote_price]
+
+        # tracking lob data
+        if len(lob) > 0: 
+            best_bid = lob['bids']['best']
+            best_ask = lob['asks']['best']
+            if best_bid == None:
+                best_bid = 0
+            if best_ask == None:
+                best_ask = 0
+            
+            if best_bid + best_ask > 0:
+                bid_ask_spread = abs(best_ask - best_bid)
+                midprice = (best_bid + best_ask)/2
+            else:
+                bid_ask_spread = midprice = 0
+
+            num_bids = lob['bids']['n']
+            num_asks = lob['asks']['n']
+
+            if (num_bids + num_asks != 0):
+                micro_price = ((num_bids * best_ask) + (num_asks * best_bid)) / (num_bids + num_asks)
+            else:
+                micro_price = 0
+
+        else:
+            best_bid = 0
+            best_ask = 0
+            bid_ask_spread = 0
+            bid_ask_spread = 0
+            midprice = 0
+            micro_price = 0
+
+        if p_eq <= 0:
+            p_eq = 0
+
+        lob_data = [time, bid_ask_spread, midprice, micro_price, best_bid, best_ask, p_eq, q_eq]
+        
+        quote_log_entry = lob_data + order_data
+
+        self.quote_log.append(quote_log_entry)
+        return
+    
+    def quote_log_to_csv(self):
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f'quote_log_{self.ttype}_{self.tid}_{timestamp}.csv'
+        folder_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data'
+        file_path = os.path.join(folder_path, filename)
+
+        with open(file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            headers = ['time', 'bid_ask_spread', 'midprice', 'micro_price', 'best_bid', 'best_ask', 'prev_batch_price', 'prev_batch_qty', 'trader_id', 'limit_price', 'quote_price']
+            writer.writerow(headers)
+            writer.writerows(self.quote_log)
+            return
 
     def add_order(self, order, verbose):
         """
@@ -273,6 +345,17 @@ class TraderGiveaway(Trader):
                           self.orders[coid].qty,
                           time, self.orders[coid].coid, self.orders[coid].toid)
             
+            limit_price = self.orders[coid].price
+            order_type = self.orders[coid].otype
+            # This code excludes duplicated quote prices from the quote log save
+            # if self.last_quote is None:
+            #     last_quote_price = 0
+            # else:
+            #     last_quote_price = self.last_quote.price
+            # if quote_price != last_quote_price:
+            #     self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price)
+            self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price, order_type)
+
             self.last_quote = order
             # print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
        
@@ -471,6 +554,9 @@ class TraderZip(Trader):
 
             order = Order(self.tid, self.job, quote_price, self.orders[coid].qty, time, self.orders[coid].coid,
                           self.orders[coid].toid)
+            limit_price = self.limit
+            order_type = self.orders[coid].otype
+            self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price, order_type)
             self.last_quote = order
         return order
 
@@ -941,7 +1027,9 @@ class TraderAa(Trader):
                     quote_price = o_bid
                 else:
                     quote_price = o_ask - ((o_ask - self.sell_target) / self.offer_change_rate)
-
+        limit_price = self.limit
+        order_type = self.orders[coid].otype
+        self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price)
         order = Order(self.tid, self.job, int(quote_price), self.orders[coid].qty, time, self.orders[coid].coid,
                       self.orders[coid].toid)
         self.last_quote = order
