@@ -65,6 +65,12 @@ from tensorflow.keras import backend as K
 DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/1secbatch_modelv5.keras'
 DFBA_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/1secbatch_scalerv5.joblib'
 
+# Training Data Saving location
+timestamp = time.strftime("%Y%m%d-%H%M%S")
+folder_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data'
+output_file = f'training_quote_logs_{timestamp}.csv'
+output_path = os.path.join(folder_path, output_file)
+
 # Adapted from original BSE code
 def trade_stats(expid, traders, dumpfile):
     """dump CSV statistics on exchange data and trader population to file for later analysis
@@ -269,16 +275,16 @@ def run_exchange(
         if elapsed_time>=batch_period and required_batch_number !=0 :
             #required_batch_number-=1; #uncomment this for testing
 
-            trade_data = get_trade_data(lob, last_batch_time, trades, p_eq)
+            # trade_data = get_trade_data(lob, last_batch_time, trades, p_eq)
 
             trades, lob,p_eq,q_eq,demand_curve,supply_curve = exchange.process_order_batch2(virtual_time, orders_to_batch, process_verbose)   
 
-            trade_price = get_trade_price(trades, virtual_time)
+            # trade_price = get_trade_price(trades, virtual_time)
 
-            if len(orders_to_batch) > 0:
-                for order in orders_to_batch:
-                    order_data = get_order_data(order)
-                    write_to_csv(trade_data, trade_price, order_data, file_path)
+            # if len(orders_to_batch) > 0:
+            #     for order in orders_to_batch:
+            #         order_data = get_order_data(order)
+            #         write_to_csv(trade_data, trade_price, order_data, file_path)
 
             
 
@@ -507,7 +513,7 @@ def market_session(
         thread.join()
 
     traders_to_track = ['GVWY', 'ZIP', 'AA']
-    export_quote_logs(traders, traders_to_track)
+    export_quote_logs(traders, traders_to_track, output_path)
     # for trader in traders.values():
     #     if trader.ttype == 'GVWY':
     #         # print(f"Saving CSV for trader ID: {trader.tid}, Type: {trader.ttype}")

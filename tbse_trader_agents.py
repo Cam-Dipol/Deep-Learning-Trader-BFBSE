@@ -98,7 +98,9 @@ class Trader:
         return
     
     def quote_log_to_csv(self):
-        
+        '''
+        Saves quote log to csv, not currently in use
+        '''
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f'quote_log_{self.ttype}_{self.tid}_{timestamp}.csv'
         folder_path = 'C:/Users/camer/Documents/Masters Thesis/Data/Training data'
@@ -348,13 +350,13 @@ class TraderGiveaway(Trader):
             limit_price = self.orders[coid].price
             order_type = self.orders[coid].otype
             # This code excludes duplicated quote prices from the quote log save
-            # if self.last_quote is None:
-            #     last_quote_price = 0
-            # else:
-            #     last_quote_price = self.last_quote.price
-            # if quote_price != last_quote_price:
-            #     self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price)
-            self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price, order_type)
+            if self.last_quote is None:
+                last_quote_price = 0
+            else:
+                last_quote_price = self.last_quote.price
+            if quote_price != last_quote_price:
+                self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price, order_type)
+
 
             self.last_quote = order
             # print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
@@ -556,7 +558,12 @@ class TraderZip(Trader):
                           self.orders[coid].toid)
             limit_price = self.limit
             order_type = self.orders[coid].otype
-            self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price, order_type)
+            if self.last_quote is None:
+                last_quote_price = 0
+            else:
+                last_quote_price = self.last_quote.price
+            if quote_price != last_quote_price:
+                self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price, order_type)
             self.last_quote = order
         return order
 
@@ -1029,7 +1036,14 @@ class TraderAa(Trader):
                     quote_price = o_ask - ((o_ask - self.sell_target) / self.offer_change_rate)
         limit_price = self.limit
         order_type = self.orders[coid].otype
-        self.save_quote_log(lob, time, p_eq, q_eq, quote_price, limit_price)
+        
+        if self.last_quote is None:
+                last_quote_price = 0
+        else:
+            last_quote_price = self.last_quote.price
+        if int(quote_price) != last_quote_price:
+            self.save_quote_log(lob, time, p_eq, q_eq, int(quote_price), limit_price, order_type)
+
         order = Order(self.tid, self.job, int(quote_price), self.orders[coid].qty, time, self.orders[coid].coid,
                       self.orders[coid].toid)
         self.last_quote = order
