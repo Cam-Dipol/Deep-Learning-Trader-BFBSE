@@ -222,7 +222,7 @@ class DeepFBATrader(Trader):
     model = None
     predict = None
 
-    def __init__(self, ttype, tid, balance, time, model_filepath, scaler_path='scaler.joblib'):
+    def __init__(self, ttype, tid, balance, time, model_filepath, scaler_path):
         
         Trader.__init__(self, ttype, tid, balance, time)
 
@@ -282,6 +282,20 @@ class DeepFBATrader(Trader):
         input_data = [time, bid_ask_spread, midprice, micro_price, best_bid, best_ask, prev_batch_price, prev_batch_qty]   
         
         return input_data
+    
+    def get_input_data_DFBA2(self,time,p_eq, q_eq,lob, limit, otype):
+        old_model_data = self.get_input_data(time,p_eq, q_eq,lob)
+
+        order_type_val = 0
+
+        if otype == "Ask":
+            order_type_val = 1
+        
+        new_data = [order_type_val, limit]
+
+        new_model_data = old_model_data + new_data
+
+        return new_model_data
 
     
     def get_order(self,time,p_eq ,q_eq, demand_curve,supply_curve,countdown,lob):
@@ -293,7 +307,9 @@ class DeepFBATrader(Trader):
             limit = self.orders[coid].price
             otype = self.orders[coid].otype
 
-            input_data = self.get_input_data(time, p_eq, q_eq, lob)
+            input_data = self.get_input_data_DFBA2(time, p_eq, q_eq, lob, limit, otype)
+
+            # input_data = self.get_input_data(time, p_eq, q_eq, lob)
 
             # input_data = self.input_data
             input_data = np.array(input_data).reshape(1, -1)

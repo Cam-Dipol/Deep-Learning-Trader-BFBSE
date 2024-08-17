@@ -62,8 +62,8 @@ from Training_data_extraction import get_trade_data, get_trade_price, write_to_c
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/1secbatch_modelv5.keras'
-DFBA_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/1secbatch_scalerv5.joblib'
+DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/quote_log_model_1sec_v1.keras'
+DFBA_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/scaler_quote_1sec.joblib'
 
 # Training Data Saving location
 timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -512,8 +512,11 @@ def market_session(
     for thread in trader_threads:
         thread.join()
 
-    traders_to_track = ['GVWY', 'ZIP', 'AA']
-    export_quote_logs(traders, traders_to_track, output_path)
+    # traders_to_track = ['GVWY', 'ZIP', 'AA']
+    # export_quote_logs(traders, traders_to_track, output_path)
+
+
+
     # for trader in traders.values():
     #     if trader.ttype == 'GVWY':
     #         # print(f"Saving CSV for trader ID: {trader.tid}, Type: {trader.ttype}")

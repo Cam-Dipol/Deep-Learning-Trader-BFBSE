@@ -6,9 +6,9 @@
 batch_interval = 1 # interval between batches in number of seconds. 
 
 # General
-sessionLength = 50  # Length of session in seconds.
+sessionLength = 10  # Length of session in seconds.
 
-virtualSessionLength = 28800  # Number of virtual timesteps per sessionLength.
+virtualSessionLength = 600  # Number of virtual timesteps per sessionLength.
 verbose = False # Adds additional output for debugging. #changed this to True
 
 # BSE ONLY
@@ -18,13 +18,13 @@ end_time = 10.0
 # Trader Schedule
 # Define number of each algorithm used one side of exchange (buyers or sellers).
 # Same values will be used to define other side of exchange (buyers = sellers).
-numZIC = 10
-numZIP = 1
+numZIC = 0
+numZIP = 0
 numGDX = 0
-numAA = 1
-numGVWY = 1
+numAA = 0
+numGVWY = 19
 numSHVR = 0
-numDFBA = 0
+numDFBA = 1
 
 # Order Schedule
 useOffset = False  # Use an offset function to vary equilibrium price, this is disabled if useInputFile = True #causes multiple prints sometimes?
@@ -61,7 +61,7 @@ demand = {
 numTrials = 1
 
 # For multiple schedules: using input csv file. 
-numSchedulesPerRatio = 1 # Number of schedules per ratio of traders in csv file.
+numSchedulesPerRatio = 10 # Number of schedules per ratio of traders in csv file.
 numTrialsPerSchedule = 1  # Number of trails per schedule.
 symmetric = True  # Should range of supply = range of demand?
 
