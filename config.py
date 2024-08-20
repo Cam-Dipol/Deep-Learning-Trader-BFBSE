@@ -19,10 +19,10 @@ end_time = 10.0
 # Define number of each algorithm used one side of exchange (buyers or sellers).
 # Same values will be used to define other side of exchange (buyers = sellers).
 numZIC = 0
-numZIP = 0
+numZIP = 5
 numGDX = 0
-numAA = 0
-numGVWY = 19
+numAA = 5
+numGVWY = 5
 numSHVR = 0
 numDFBA = 1
 
@@ -32,7 +32,7 @@ useInputFile = False  # Use an input file to define order schedule (e.g. Real Wo
 input_file = "RWD/IBM-310817.csv" # Path to real world data input file
 stepmode = 'random'  # Valid values: 'fixed', 'jittered', 'random'
 timemode = 'drip-fixed'  # Valid values: 'periodic', 'drip-fixed', 'drip-jitter', 'drip-poisson'
-interval = 19  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
+interval = 120  # Virtual seconds between new set of customer orders being generated. #changed to 250 from 30
 
 # Market supply schedule
 
@@ -58,7 +58,7 @@ demand = {
 }
 
 # For single schedule: using config trader schedule, or command-line trader schedule.
-numTrials = 1
+numTrials = 10
 
 # For multiple schedules: using input csv file. 
 numSchedulesPerRatio = 10 # Number of schedules per ratio of traders in csv file.

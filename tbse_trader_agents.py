@@ -222,7 +222,7 @@ class DeepFBATrader(Trader):
     model = None
     predict = None
 
-    def __init__(self, ttype, tid, balance, time, model_filepath, scaler_path):
+    def __init__(self, ttype, tid, balance, time, model_filepath, input_scaler_path, output_scaler_path):
         
         Trader.__init__(self, ttype, tid, balance, time)
 
@@ -233,8 +233,144 @@ class DeepFBATrader(Trader):
                 DeepFBATrader.predict = tf.function(DeepFBATrader.model, reduce_retracing=True)
 
         self.model = DeepFBATrader.model
-        self.scaler = joblib.load(scaler_path)
+        self.input_scaler = joblib.load(input_scaler_path)
+        self.output_scaler = joblib.load(output_scaler_path)
 
+        self.input_data = []
+
+        # self.interpreter = tf.lite.Interpreter(model_path=model_filepath)
+        # self.interpreter.allocate_tensors()
+        # self.input_details = self.interpreter.get_input_details()
+        # self.output_details = self.interpreter.get_output_details()
+
+    def get_input_data(self,time,p_eq, q_eq,lob):
+        '''
+        Gets data from the LOB that was used to train the model
+
+        Puts this data into the correct format for input into the model
+        '''
+        
+        best_bid = lob['bids']['best']
+        best_ask = lob['asks']['best']
+
+        if best_bid == None:
+            best_bid = 0
+        if best_ask == None:
+            best_ask = 0
+        
+        if best_bid + best_ask > 0:
+            bid_ask_spread = abs(best_ask - best_bid)
+            midprice = (best_bid + best_ask)/2
+        else:
+            bid_ask_spread = midprice = 0
+        
+        num_bids = lob['bids']['n']
+        num_asks = lob['asks']['n']
+
+        if (num_bids + num_asks != 0):
+            micro_price = ((num_bids * best_ask) + (num_asks * best_bid)) / (num_bids + num_asks)
+        else:
+            micro_price = 0
+        
+        if p_eq > 0:
+            prev_batch_price = p_eq
+            prev_batch_qty = q_eq
+        else:
+            prev_batch_price = 0
+            prev_batch_qty = 0
+        
+        input_data = [time, bid_ask_spread, midprice, micro_price, best_bid, best_ask, prev_batch_price, prev_batch_qty]   
+        
+        return input_data
+    
+    def get_input_data_DFBA2(self,time,p_eq, q_eq,lob, limit, otype):
+        old_model_data = self.get_input_data(time,p_eq, q_eq,lob)
+
+        order_type_val = 0
+
+        if otype == "Ask":
+            order_type_val = 1
+        
+        new_data = [order_type_val, limit]
+
+        new_model_data = old_model_data + new_data
+
+        return new_model_data
+
+    
+    def get_order(self,time,p_eq ,q_eq, demand_curve,supply_curve,countdown,lob):
+
+        if len(self.orders) < 1:
+            order = None
+        else:
+            coid = max(self.orders.keys())
+            limit = self.orders[coid].price
+            otype = self.orders[coid].otype
+
+            # input_data = self.get_input_data_DFBA2(time, p_eq, q_eq, lob, limit, otype)
+
+            input_data = self.get_input_data(time, p_eq, q_eq, lob)
+
+            # input_data = self.input_data
+            input_data = np.array(input_data).reshape(1, -1)
+            input_data_scaled = self.input_scaler.transform(input_data)
+            input_data_scaled = input_data_scaled.reshape((input_data_scaled.shape[0], 1, input_data_scaled.shape[1]))
+            # input_data_scaled = input_data_scaled.astype(np.float16)
+
+            # model_price = self.model(input_data_scaled)
+            pred_equil_price = DeepFBATrader.predict(input_data_scaled).numpy()[0][0]
+            pred_equil_price = self.output_scaler.inverse_transform(np.array([[pred_equil_price]]))[0][0]
+          
+
+            minimum_profit_percent = 0.02
+            minimum_profit_margin = minimum_profit_percent * limit
+
+            if otype == "Ask":
+                model_price = pred_equil_price + minimum_profit_margin
+            else:
+                model_price = pred_equil_price - minimum_profit_margin
+
+            # Ensuring that the quote price is of a valid tick size (1 in this)
+            model_price = round(model_price)
+
+
+            if otype == "Ask":
+                if model_price < limit:
+                    model_price = limit
+            else:
+                if model_price > limit:
+                    model_price = limit
+
+            quote_price = model_price
+            
+            order = Order(self.tid, otype, quote_price, self.orders[coid].qty, time, self.orders[coid].coid,
+                          self.orders[coid].toid)
+            self.last_quote = order
+            # print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
+        return order
+
+
+class DeepFBATrader2(Trader):
+    '''
+    Deep learning neural network based trader
+    Loads a previously trained DLNN and allows it to function in the market
+    '''
+    model = None
+    predict = None
+
+    def __init__(self, ttype, tid, balance, time, model_filepath, input_scaler_path, output_scaler_path):
+        
+        Trader.__init__(self, ttype, tid, balance, time)
+
+        if DeepFBATrader2.model is None:
+            DeepFBATrader2.model = tf.keras.models.load_model(model_filepath)
+
+        if DeepFBATrader2.predict is None:
+                DeepFBATrader2.predict = tf.function(DeepFBATrader.model, reduce_retracing=True)
+
+        self.model = DeepFBATrader2.model
+        self.input_scaler = joblib.load(input_scaler_path)
+        self.output_scaler = joblib.load(output_scaler_path)
 
         self.input_data = []
 
@@ -309,19 +445,18 @@ class DeepFBATrader(Trader):
 
             input_data = self.get_input_data_DFBA2(time, p_eq, q_eq, lob, limit, otype)
 
-            # input_data = self.get_input_data(time, p_eq, q_eq, lob)
-
             # input_data = self.input_data
             input_data = np.array(input_data).reshape(1, -1)
-            input_data_scaled = self.scaler.transform(input_data)
+            input_data_scaled = self.input_scaler.transform(input_data)
             input_data_scaled = input_data_scaled.reshape((input_data_scaled.shape[0], 1, input_data_scaled.shape[1]))
             # input_data_scaled = input_data_scaled.astype(np.float16)
 
             # model_price = self.model(input_data_scaled)
-            model_price = DeepFBATrader.predict(input_data_scaled).numpy()[0][0]
+            model_price = DeepFBATrader2.predict(input_data_scaled).numpy()[0][0]
+            model_price = self.output_scaler.inverse_transform(np.array([[model_price]]))[0][0]
             model_price = int(model_price)
             model_price = round(model_price) # Ensuring that the quote price is of a valid tick size (1 in this)
-
+            print(model_price)
             if otype == "Ask":
                 if model_price < limit:
                     model_price = limit
@@ -336,6 +471,7 @@ class DeepFBATrader(Trader):
             self.last_quote = order
             # print(f"Trader {self.tid} of {self.orders[coid].otype} has orders with limit prices {[o[1].price for o in self.orders.items()]} at time {time} \n")
         return order
+
 
 class TraderGiveaway(Trader):
     """
