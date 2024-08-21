@@ -58,10 +58,10 @@ demand = {
 }
 
 # For single schedule: using config trader schedule, or command-line trader schedule.
-numTrials = 10
+numTrials = 1
 
 # For multiple schedules: using input csv file. 
-numSchedulesPerRatio = 10 # Number of schedules per ratio of traders in csv file.
+numSchedulesPerRatio = 50 # Number of schedules per ratio of traders in csv file.
 numTrialsPerSchedule = 1  # Number of trails per schedule.
 symmetric = True  # Should range of supply = range of demand?
 

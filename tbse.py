@@ -57,14 +57,14 @@ import config
 from tbse_customer_orders import customer_orders
 from tbse_exchange import Exchange
 from tbse_trader_agents import TraderGiveaway, TraderShaver, TraderSniper, \
-    TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader
+    TraderZic, TraderZip, TraderAa, TraderGdx, DeepFBATrader, DeepFBATrader2
 from Training_data_extraction import get_trade_data, get_trade_price, write_to_csv, make_csv, get_order_data, export_quote_logs
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/1secbatch_model_v10_MINMAX.keras'
-DFBA_input_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/input_scaler_equil_predictor_minmax.joblib'
-DFBA_output_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/output_scaler_equil_predictor_minmax.joblib'
+DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/quote_log_model_1sec_v5.keras'
+DFBA_input_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/input_scaler_quote_minmax.joblib'
+DFBA_output_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/output_scaler_quote_minmax.joblib'
 
 # Training Data Saving location
 timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -143,7 +143,7 @@ def populate_market(trader_spec, traders, shuffle, verbose):
         if robot_type == 'GDX':
             return TraderGdx('GDX', name, 0.00, 0)
         if robot_type == 'DFBA':
-            return DeepFBATrader('DFBA', name, 0.00, 0, DFBA_filepath, DFBA_input_scaler, DFBA_output_scaler)
+            return DeepFBATrader2('DFBA', name, 0.00, 0, DFBA_filepath, DFBA_input_scaler, DFBA_output_scaler)
         sys.exit(f'FATAL: don\'t know robot type {robot_type}\n')
 
     def shuffle_traders(ttype_char, n, trader_list):

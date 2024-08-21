@@ -366,7 +366,7 @@ class DeepFBATrader2(Trader):
             DeepFBATrader2.model = tf.keras.models.load_model(model_filepath)
 
         if DeepFBATrader2.predict is None:
-                DeepFBATrader2.predict = tf.function(DeepFBATrader.model, reduce_retracing=True)
+                DeepFBATrader2.predict = tf.function(DeepFBATrader2.model, reduce_retracing=True)
 
         self.model = DeepFBATrader2.model
         self.input_scaler = joblib.load(input_scaler_path)
@@ -456,7 +456,7 @@ class DeepFBATrader2(Trader):
             model_price = self.output_scaler.inverse_transform(np.array([[model_price]]))[0][0]
             model_price = int(model_price)
             model_price = round(model_price) # Ensuring that the quote price is of a valid tick size (1 in this)
-            print(model_price)
+
             if otype == "Ask":
                 if model_price < limit:
                     model_price = limit
