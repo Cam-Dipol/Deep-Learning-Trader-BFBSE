@@ -227,7 +227,7 @@ class DeepFBATrader(Trader):
         Trader.__init__(self, ttype, tid, balance, time)
 
         if DeepFBATrader.model is None:
-            DeepFBATrader.model = tf.keras.models.load_model(model_filepath)
+            DeepFBATrader.model = keras.models.load_model(model_filepath)
 
         if DeepFBATrader.predict is None:
                 DeepFBATrader.predict = tf.function(DeepFBATrader.model, reduce_retracing=True)
@@ -363,7 +363,7 @@ class DeepFBATrader2(Trader):
         Trader.__init__(self, ttype, tid, balance, time)
 
         if DeepFBATrader2.model is None:
-            DeepFBATrader2.model = tf.keras.models.load_model(model_filepath)
+            DeepFBATrader2.model = keras.models.load_model(model_filepath)
 
         if DeepFBATrader2.predict is None:
                 DeepFBATrader2.predict = tf.function(DeepFBATrader2.model, reduce_retracing=True)
