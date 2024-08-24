@@ -62,9 +62,9 @@ from Training_data_extraction import get_trade_data, get_trade_price, write_to_c
 import tensorflow as tf
 from tensorflow.keras import backend as K
 
-DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/quote_log_model_1sec_v5.keras'
-DFBA_input_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/input_scaler_quote_minmax.joblib'
-DFBA_output_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/output_scaler_quote_minmax.joblib'
+DFBA_filepath = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/Neural_network_models/quote_log_model_1sec_v1_10secbatch.keras'
+DFBA_input_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/input_scaler_quote_minmax_10secbatch.joblib'
+DFBA_output_scaler = 'C:/Users/camer/Documents/Masters Thesis/Deep-Learning-Trader-BFBSE/scalers/output_scaler_quote_minmax_10_secbatch.joblib'
 
 # Training Data Saving location
 timestamp = time.strftime("%Y%m%d-%H%M%S")

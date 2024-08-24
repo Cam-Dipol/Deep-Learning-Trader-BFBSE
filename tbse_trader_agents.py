@@ -227,7 +227,7 @@ class DeepFBATrader(Trader):
         Trader.__init__(self, ttype, tid, balance, time)
 
         if DeepFBATrader.model is None:
-            DeepFBATrader.model = keras.models.load_model(model_filepath)
+            DeepFBATrader.model = tf.keras.models.load_model(model_filepath)
 
         if DeepFBATrader.predict is None:
                 DeepFBATrader.predict = tf.function(DeepFBATrader.model, reduce_retracing=True)
@@ -322,13 +322,13 @@ class DeepFBATrader(Trader):
             pred_equil_price = self.output_scaler.inverse_transform(np.array([[pred_equil_price]]))[0][0]
           
 
-            minimum_profit_percent = 0.02
-            minimum_profit_margin = minimum_profit_percent * limit
+            adjustment_percentage = 0.02
+            adjustment_margin = adjustment_percentage * limit
 
             if otype == "Ask":
-                model_price = pred_equil_price + minimum_profit_margin
+                model_price = pred_equil_price + adjustment_margin
             else:
-                model_price = pred_equil_price - minimum_profit_margin
+                model_price = pred_equil_price - adjustment_margin
 
             # Ensuring that the quote price is of a valid tick size (1 in this)
             model_price = round(model_price)
@@ -363,7 +363,7 @@ class DeepFBATrader2(Trader):
         Trader.__init__(self, ttype, tid, balance, time)
 
         if DeepFBATrader2.model is None:
-            DeepFBATrader2.model = keras.models.load_model(model_filepath)
+            DeepFBATrader2.model = tf.keras.models.load_model(model_filepath)
 
         if DeepFBATrader2.predict is None:
                 DeepFBATrader2.predict = tf.function(DeepFBATrader2.model, reduce_retracing=True)
