@@ -3,7 +3,7 @@
 
 # BFBSE 
 
-batch_interval = 10 # interval between batches in number of seconds. 
+batch_interval = 1 # interval between batches in number of seconds. 
 
 # General
 sessionLength = 10  # Length of session in seconds.
@@ -19,12 +19,12 @@ end_time = 10.0
 # Define number of each algorithm used one side of exchange (buyers or sellers).
 # Same values will be used to define other side of exchange (buyers = sellers).
 numZIC = 0
-numZIP = 5
+numZIP = 0
 numGDX = 0
-numAA = 5
-numGVWY = 5
+numAA = 0
+numGVWY = 10
 numSHVR = 0
-numDFBA = 5
+numDFBA = 10
 
 # Order Schedule
 useOffset = False  # Use an offset function to vary equilibrium price, this is disabled if useInputFile = True #causes multiple prints sometimes?
@@ -58,7 +58,7 @@ demand = {
 }
 
 # For single schedule: using config trader schedule, or command-line trader schedule.
-numTrials = 50
+numTrials = 10
 
 # For multiple schedules: using input csv file. 
 numSchedulesPerRatio = 50 # Number of schedules per ratio of traders in csv file.
